@@ -39,3 +39,9 @@ sketch
 .idea/
 *.swp
 *.swo
+
+### terraform ###
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+*.tfvars
