@@ -1,0 +1,33 @@
+services:
+  currency:
+    build: 
+      context: .
+      dockerfile: currency/Dockerfile
+  
+  product-images:
+    build:
+      context: .
+      dockerfile: product-images/Dockerfile
+    ports:
+      - "9091:9091"
+    volumes:
+      - ./product-images/imagestore:/app/imagestore
+    
+  product-api:
+    build:
+      context: .
+      dockerfile: product-api/Dockerfile
+    ports:
+      - "9090:9090"
+    depends_on:
+      - currency
+      - product-images
+  
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:8080"
+    depends_on:
+      - product-api
