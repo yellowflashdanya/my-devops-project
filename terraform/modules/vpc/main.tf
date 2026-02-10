@@ -17,9 +17,10 @@ resource "aws_internet_gateway" "igw" {
 
 # Create a public subnet in the VPC
 resource "aws_subnet" "public" {
+  count             = length(var.availability_zones)
   vpc_id            = aws_vpc.main.id
-  cidr_block        = var.public_subnet_cidr
-  availability_zone = var.availability_zone
+  cidr_block        = cidrsubnet(var.cidr_block, 8, count.index + 1)
+  availability_zone = var.availability_zones[count.index]
 
   tags = {
     Name = "${var.name}-public-subnet"
@@ -41,7 +42,8 @@ resource "aws_route_table" "public" {
 }
 
 resource "aws_route_table_association" "public" {
-  subnet_id      = aws_subnet.public.id
+  count          = length(var.availability_zones)
+  subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id
 }
 
@@ -57,7 +59,7 @@ resource "aws_eip" "nat" {
 # Create a NAT Gateway in the public subnet
 resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.nat.id
-  subnet_id     = aws_subnet.public.id
+  subnet_id     = aws_subnet.public[0].id
 
   tags = {
     Name = "${var.name}-nat"
@@ -66,12 +68,13 @@ resource "aws_nat_gateway" "nat" {
 
 # Create a private subnet in the VPC
 resource "aws_subnet" "private" {
+  count             = length(var.availability_zones)
   vpc_id            = aws_vpc.main.id
-  cidr_block        = var.private_subnet_cidr
-  availability_zone = var.availability_zone
+  cidr_block        = cidrsubnet(var.cidr_block, 8, count.index + 10)
+  availability_zone = var.availability_zones[count.index]
 
   tags = {
-    Name = "${var.name}-private-subnet"
+    Name = "${var.name}-private-subnet-${count.index}"
   }
 }
 
@@ -91,6 +94,7 @@ resource "aws_route_table" "private" {
 
 # Associate the private subnet with the private route table
 resource "aws_route_table_association" "private" {
-  subnet_id      = aws_subnet.private.id
+  count          = length(var.availability_zones)
+  subnet_id      = aws_subnet.private[count.index].id
   route_table_id = aws_route_table.private.id
 }
