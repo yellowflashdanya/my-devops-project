@@ -5,8 +5,8 @@ To define optimal limits for resources (requests/limits), decide to test the mic
 
 ### Test results:
 
-- **Idle:** ![Idle Stats](./images/stats_idle.png)
-- **Load (500 requests):** ![Load Stats](./images/stats_load.png)
+- **Idle:** ![Idle Stats](../../images/stats_idle.png)
+- **Load (500 requests):** ![Load Stats](../../images/stats_load.png)
 
 
 ### Conclusions for Kubernetes:
